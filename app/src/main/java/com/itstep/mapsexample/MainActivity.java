@@ -17,6 +17,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
@@ -70,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
     void loadRoute(){
-        api.getRoute("35.000,34.000","35.000,34.020","!!!!!!!!!!!!!!!!!! direction api key",true,"ru")
+        api.getRoute("35.000,34.000","35.000,34.020","AIzaSyBaPfiTa-pWC4cmASeTsAFKVW547F9AXPY",true,"ru")
                 .enqueue(new Callback<DirectionResponse>() {
                     @Override
                     public void onResponse(Call<DirectionResponse> call, Response<DirectionResponse> response) {
@@ -106,13 +107,37 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(final GoogleMap googleMap) {
         map=googleMap;
+        googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,R.raw.maps));
         googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder()
                 .zoom(15)
                 .target(new LatLng(35.000,34.000))
                 .build())
         );
+
+        googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+
+                CameraPosition position = googleMap.getCameraPosition();
+                LatLng curPos = position.target;
+
+
+                googleMap.getUiSettings().setScrollGesturesEnabled(false);
+                googleMap.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(35.000,34.020)),new GoogleMap.CancelableCallback(){
+                    @Override
+                    public void onFinish() {
+                        Toast.makeText(MainActivity.this,"finosh",Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onCancel() {
+
+                    }
+                });
+            }
+        });
 
         loadRoute();
 //        PolylineOptions polylineOptions = new PolylineOptions()
